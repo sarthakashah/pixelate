@@ -70,7 +70,8 @@ int main()
          1,  0, -1
     );
 
-    cv::Mat img = cv::imread("./assets/hogwarts.png", cv::IMREAD_COLOR);
+    cv::Mat img = cv::imread("./assets/hogwarts.png", cv::IMREAD_GRAYSCALE);
+
     if (img.empty()) {
         cerr << "Could not load image at ./assets/hogwarts.png\n";
         return -1;
@@ -85,13 +86,21 @@ int main()
     cv::Mat hori_k1 = convolve(img, gaussian_h_k1);
     cv::Mat hori_k2 = convolve(img, gaussian_h_k2);
 
-    cv::Mat sum1 = vert_k1 + hori_k1;
-    cv::Mat sum2 = vert_k2 + hori_k2;
-    
-    cv::imshow("Output of K1", sum1);
+    // cv::Mat sum1 = vert_k1 + hori_k1;
+    // cv::Mat sum2 = vert_k2 + hori_k2;
+    cv::Mat intermediate1;
+    cv::Mat intermediate2;
+
+    // Now to actually convolve
+    intermediate1 = convolve(img, gaussian_v_k1);         // Convolve Vertically
+    cv::Mat output1 = convolve(intermediate1, gaussian_h_k1);
+    intermediate2 = convolve(img, gaussian_v_k2);         // Convolve Vertically
+    cv::Mat output2 = convolve(intermediate2, gaussian_h_k2);
+
+    cv::imshow("Output of K1", output1);
     cv::waitKey(0);
     
-    cv::imshow("Output of k2", sum2);
+    cv::imshow("Output of k2", output2);
     // TODO: apply K1 and K2 to img_f with as few multiplications per pixel as possible.
     // Print the number of multiplications your approach uses per pixel.
     std::cout << "Number of multiplications: 6 multiplications per pixel" << endl;
